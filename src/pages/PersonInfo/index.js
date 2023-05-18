@@ -2,10 +2,14 @@ import React, { memo } from 'react'
 import { Checkbox, DatePicker, Form, Input, InputNumber, Rate, Select } from "antd";
 import { SimpleGrid } from '@chakra-ui/react';
 import ProfilePatientForm from '../../components/ProfilePatientForm';
+import { useGlobalContext } from '../../modules/context/index.js';
+
 const OPTIONS = ["0-6", "6-12", "12-24", "24+"];
 
 function PersonInfo() {
-    const [form] = Form.useForm();
+
+    const { personInfoForm } = useGlobalContext()
+
     return (
         <>
             <ProfilePatientForm />
@@ -13,7 +17,7 @@ function PersonInfo() {
             <SimpleGrid columns={['1', '2']} p='2' my='2' boxShadow='xl' bg='pink.50' borderRadius='15px'>
 
                 <Form
-                    form={form}
+                    form={personInfoForm}
                     labelWrap
                     labelAlign="right"
                     labelCol={{
@@ -25,17 +29,22 @@ function PersonInfo() {
                     style={{
                         maxWidth: 600,
                     }}
+                    initialValues={{
+                        gender: 'Female',
+                    }}
                 >
                     <Form.Item label="Birth date" name="birthDate">
-                        <DatePicker />
+                        <DatePicker allowClear />
                     </Form.Item>
 
                     <Form.Item label="Birth place" name="birthPlace">
                         <Input />
                     </Form.Item>
+
                     <Form.Item name="phoneNumber" label="Phone Number">
-                        <Input />
+                        <Input type='number' />
                     </Form.Item>
+
                     <Form.Item label="Sex" name="gender">
                         <Select
                             allowClear
@@ -89,7 +98,7 @@ function PersonInfo() {
                     </Form.Item>
                 </Form>
                 <Form
-                    form={form}
+                    form={personInfoForm}
                     labelAlign="right"
                     labelCol={{
                         span: 8,

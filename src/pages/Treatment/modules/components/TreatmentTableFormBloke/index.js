@@ -1,24 +1,66 @@
 import React, { memo, useState } from 'react'
-import { DatePicker, Form, Input, InputNumber, Radio, Select, Space } from 'antd'
+import { Button, DatePicker, Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import { SimpleGrid } from '@chakra-ui/react'
-import moment from 'moment';
+import { useStore } from '../../../../../modules/store';
+import dayjs from 'dayjs';
+import { PathologistSelectInput } from '../../../../../components/SelectInputs';
+import { fetchPathologistsPlace } from '../../../../../modules/api';
+import { useQuery } from 'react-query';
 
-function TreatmentTableFormBloke() {
+function TreatmentTableFormBloke(props) {
 
-    const [form] = Form.useForm();
+    const { selectedRowKey, setSelectedRowKey, form } = props
 
     const [isBenign, setIsBenign] = useState(false)
+
+    const dataSourceTreatmentTable = useStore((store) => store.dataSourceTreatmentTable)
+    const setDataSourceTreatmentTable = useStore((store) => store.setDataSourceTreatmentTable)
+
+    const onFinish = (values) => {
+        try {
+            if (selectedRowKey) {
+                let newData = dataSourceTreatmentTable.map((i) => {
+                    if (i.id === values.id) {
+                        values.treatmentDate = dayjs(values.treatmentDate).format('YYYY-MM-DD HH:mm')
+                        return { ...values }
+
+                    }
+                    else return i
+                })
+                setDataSourceTreatmentTable(newData)
+            } else {
+                let id = new Date().getTime()
+                values.id = id
+                values.key = id
+                values.treatmentDate = dayjs(values.treatmentDate).format('YYYY-MM-DD HH:mm')
+                setDataSourceTreatmentTable([...dataSourceTreatmentTable, values])
+            }
+            form.resetFields()
+            setSelectedRowKey()
+        } catch (error) {
+            console.log('%c error', 'background: red; color: dark', error);
+        }
+    }
+
+    const handleClear = () => {
+        form.resetFields()
+        setSelectedRowKey()
+    }
 
     const onFieldsChange = ([{ name, value }]) => {
         const nameFormInput = name && name[0]
         if (nameFormInput === 'treatmentTypeName') setIsBenign(value === 'benign')
     }
 
+    const { data: pathologistsList } = useQuery(["managers/pathologists"], fetchPathologistsPlace)
+
     return (
 
         <SimpleGrid columns={['1', '2']} gap='1' >
 
             <Form
+                onFinish={onFinish}
+                id='treatmentTableFormBlok'
                 form={form}
                 labelWrap
                 labelAlign="right"
@@ -33,10 +75,15 @@ function TreatmentTableFormBloke() {
                 }}
             >
 
+                <Form.Item hidden name='id'>
+                    <Input />
+                </Form.Item>
+
                 <Form.Item label="Date" name="treatmentDate">
                     <DatePicker
                         format="YYYY-MM-DD HH:mm"
-                        defaultValue={moment()}
+                        defaultValue={dayjs()}
+                        showTime
                     />
                 </Form.Item>
 
@@ -44,14 +91,14 @@ function TreatmentTableFormBloke() {
                     label="Urgent Histology"
                     name="histologyUrgent"
                 >
-                    <Input.TextArea rows={3} />
+                    <Input.TextArea showCount maxLength={3000} rows={3} />
                 </Form.Item>
 
                 <Form.Item
                     label="Histology Final"
                     name="histologyFinal"
                 >
-                    <Input.TextArea rows={3} />
+                    <Input.TextArea showCount maxLength={3000} rows={3} />
                 </Form.Item>
 
                 {isBenign ? '' : (
@@ -81,7 +128,7 @@ function TreatmentTableFormBloke() {
                                     <>
                                         <Form.Item
                                             label="Reactive"
-                                            name="SLNB_reactive"
+                                            name="slnbReactive"
                                         >
                                             <InputNumber
                                                 min={0}
@@ -89,7 +136,7 @@ function TreatmentTableFormBloke() {
                                             />
                                         </Form.Item>
 
-                                        <Form.Item label="MTS" name="SLNB_mts">
+                                        <Form.Item label="MTS" name="slnbMts">
                                             <InputNumber
                                                 min={0}
                                                 defaultValue={0}
@@ -101,7 +148,7 @@ function TreatmentTableFormBloke() {
 
                         <Form.Item
                             label="Axilla dissection"
-                            name="axillaDeseksiya"
+                            name="axillaDesection"
                         >
                             <Radio.Group>
                                 <Radio value={1}>Yes</Radio>
@@ -111,14 +158,14 @@ function TreatmentTableFormBloke() {
 
                         <Form.Item
                             noStyle
-                            shouldUpdate={(prevValues, currentValues) => prevValues.axillaDeseksiya !== currentValues.axillaDeseksiya}
+                            shouldUpdate={(prevValues, currentValues) => prevValues.axillaDesection !== currentValues.axillaDesection}
                         >
                             {({ getFieldValue }) =>
-                                getFieldValue('axillaDeseksiya') === 1 ? (
+                                getFieldValue('axillaDesection') === 1 ? (
                                     <>
                                         <Form.Item
                                             label="Reactive"
-                                            name="axillaDeseksiyaActive"
+                                            name="axillaDesectionReactive"
                                         >
                                             <InputNumber
                                                 min={0}
@@ -126,7 +173,7 @@ function TreatmentTableFormBloke() {
                                             />
                                         </Form.Item>
 
-                                        <Form.Item label="MTS" name="axillaDeseksiyaMts">
+                                        <Form.Item label="MTS" name="axillaDesectionMts">
                                             <InputNumber
                                                 min={0}
                                                 defaultValue={0}
@@ -143,6 +190,8 @@ function TreatmentTableFormBloke() {
             </Form>
 
             <Form
+                onFinish={onFinish}
+                id='treatmentTableFormBlok'
                 form={form}
                 labelWrap
                 labelAlign="right"
@@ -161,7 +210,7 @@ function TreatmentTableFormBloke() {
                 <Form.Item label="ER" >
                     <Form.Item noStyle name="ihkEr">
                         <Radio.Group>
-                            <Space direction="horizontal">
+                            <Space direction="vertical">
                                 <Radio value={1}>Positive</Radio>
                                 <Radio value={2}>Negative</Radio>
                             </Space>
@@ -171,19 +220,22 @@ function TreatmentTableFormBloke() {
                         noStyle
                         shouldUpdate={(prevValues, currentValues) => prevValues.ihkEr !== currentValues.ihkEr}
                     >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ihkEr') === 1 ? (
-                                <Form.Item noStyle name="erN">
-                                    <InputNumber size='small' />
-                                </Form.Item>
-                            ) : ''}
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('ihkEr') === 1) {
+                                return (
+                                    <Form.Item noStyle name="erN">
+                                        <InputNumber />
+                                    </Form.Item>
+                                )
+                            } else return ''
+                        }}
                     </Form.Item>
                 </Form.Item>
 
                 <Form.Item label="PR" >
                     <Form.Item noStyle name="ihkPr">
                         <Radio.Group>
-                            <Space direction="horizontal">
+                            <Space direction="vertical">
                                 <Radio value={1}>Positive</Radio>
                                 <Radio value={2}>Negative</Radio>
                             </Space>
@@ -193,33 +245,43 @@ function TreatmentTableFormBloke() {
                         noStyle
                         shouldUpdate={(prevValues, currentValues) => prevValues.ihkPr !== currentValues.ihkPr}
                     >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ihkPr') === 1 ? (
-                                <Form.Item noStyle name="prN">
-                                    <InputNumber size='small' />
-                                </Form.Item>
-                            ) : ''}
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('ihkPr') === 1) {
+                                return (
+                                    <Form.Item noStyle name="prN">
+                                        <InputNumber />
+                                    </Form.Item>
+                                )
+                            } else return ''
+                        }}
                     </Form.Item>
                 </Form.Item>
 
-                <Form.Item label="HER2" name="her2">
-                    <InputNumber
-                        min={0}
-                        max={3}
-                        defaultValue={0}
-                    />
-                </Form.Item>
-
-                <Form.Item
-                    noStyle
-                    shouldUpdate={(prevValues, currentValues) => prevValues.her2 !== currentValues.her2}
-                >
-                    {({ getFieldValue }) =>
-                        getFieldValue('her2') === 2 ? (
-                            <Form.Item label="FT" name="her2FT">
-                                <InputNumber />
-                            </Form.Item>
-                        ) : ''}
+                <Form.Item label="HER2" >
+                    <Form.Item noStyle name="her2">
+                        <InputNumber
+                            min={0}
+                            max={3}
+                            defaultValue={0}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) => prevValues.her2 !== currentValues.her2}
+                    >
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('her2') === 2) {
+                                return (
+                                    <Form.Item noStyle name="her2FT">
+                                        <InputNumber addonBefore="FT" />
+                                    </Form.Item>
+                                )
+                            } else {
+                                form.setFieldValue?.({ her2FT: '' })
+                                return ''
+                            }
+                        }}
+                    </Form.Item>
                 </Form.Item>
 
                 <Form.Item label="K67" name="k67">
@@ -227,10 +289,12 @@ function TreatmentTableFormBloke() {
                 </Form.Item>
 
                 <Form.Item label="Pathologist" name="pathologist">
-                    <Select allowClear>
-                        {[].map((i) => {
+                    <Select
+                        allowClear
+                    >
+                        {pathologistsList?.map((i) => {
                             return (
-                                <Select.Option value={i.pathologistName}>
+                                <Select.Option key={i.pathologistId} value={i.pathologistName}>
                                     {i.pathologistName}
                                 </Select.Option>
                             );
@@ -352,9 +416,26 @@ function TreatmentTableFormBloke() {
                     {({ getFieldValue }) =>
                         getFieldValue('treatmentTypeName') ? (
                             <Form.Item label="Description" name="treatmentTypeDesc">
-                                <Input.TextArea rows={3} />
+                                <Input.TextArea showCount maxLength={3000} rows={3} />
                             </Form.Item>
                         ) : ''}
+                </Form.Item>
+
+                <Form.Item>
+                    <Space>
+
+                        <Button
+                            form='treatmentTableFormBlok'
+                            htmlType='submit'
+                            type="primary"
+                        >
+                            {selectedRowKey ? 'Edit' : 'Add'}
+                        </Button>
+
+                        <Button onClick={handleClear} danger>{selectedRowKey ? "Close" : "Clear"}</Button>
+
+
+                    </Space>
                 </Form.Item>
 
             </Form>

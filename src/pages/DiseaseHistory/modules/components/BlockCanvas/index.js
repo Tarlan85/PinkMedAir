@@ -1,10 +1,9 @@
 import { Grid, GridItem } from '@chakra-ui/react'
 import React, { memo } from 'react'
 import Canvas from './Canvas'
+import image from '../../../../../modules/images/man.png'
 
-const defaultImg = '/images/deseaseImage1Data.png'
-
-function BlockCanvas({ img = defaultImg }) {
+function BlockCanvas() {
 
     return (
         <Grid
@@ -15,20 +14,20 @@ function BlockCanvas({ img = defaultImg }) {
         >
             <GridItem borderRadius='10px' rowSpan={2} colSpan={[5, 5, 5, 3]} >
 
-                <Canvas />
+                <Canvas imageName='image1' image={image} />
 
             </GridItem>
 
 
             <GridItem borderRadius='10px' colSpan={[5, 5, 5, 2]} >
 
-                <Canvas />
+                <Canvas imageName='image2' image={image} />
 
             </GridItem>
 
             <GridItem borderRadius='10px' colSpan={[5, 5, 5, 2]}>
 
-                <Canvas />
+                <Canvas imageName='image3' image={image} />
 
             </GridItem>
 

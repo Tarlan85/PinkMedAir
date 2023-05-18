@@ -1,24 +1,27 @@
+import { message } from "antd";
 import axios from "axios";
 // let API_BASE = "http://localhost:8080/api/"
+let API_BASE = "http://5.189.181.111:8080/api/"
 
-let API_BASE
+// let API_BASE
 
-axios.get("/localEnv.json").then((res) => {
-  API_BASE = res.data.API_BASE;
-});
+// axios.get("/localEnv.json").then((res) => {
+//   API_BASE = res.data.API_BASE;
+// });
 
 const verificationToken = async (url) => {
   if (url !== "login") {
     try {
       let token = localStorage.getItem("token");
       let res = await axios.get(API_BASE + "token/" + token);
-      if (res.data === "ok") {
+      if (res?.data === "ok") {
         return "ok";
-      }else if(res.data === "no"){
+      }else if(res?.data === "no"){
         localStorage.clear()
-        window.location.reload();
+        // window.location.reload();
        }
     } catch {
+      message.error("ERROR: Verification Token ")
       console.log("err in verificationToken");
     }
   }
@@ -33,7 +36,8 @@ async function sendRequest(url, obj = {}, CRUD = "get") {
       return result;
     }
   } catch (e) {
-    console.log(e);
+    message.error(e.message)
+    console.log('%c error','background: red; color: dark', e);
   }
 }
 

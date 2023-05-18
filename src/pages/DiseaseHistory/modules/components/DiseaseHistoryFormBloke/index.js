@@ -1,14 +1,44 @@
 import { SimpleGrid } from '@chakra-ui/react'
-import { Form, Input, InputNumber, Radio, Select, Space } from 'antd'
+import { Button, Form, Input, InputNumber, Radio, Select, Space } from 'antd'
 import React, { memo } from 'react'
+import { useStore } from '../../../../../modules/store';
+import { PathologistSelectInput } from '../../../../../components/SelectInputs';
 
-function DiseaseHistoryFormBloke() {
-    const [form] = Form.useForm();
+function DiseaseHistoryFormBloke(props) {
+
+    const { selectedRowKey, setSelectedRowKey, form } = props
+
+    const dataSourceDiseaseHistoryTable = useStore((store) => store.dataSourceDiseaseHistoryTable)
+    const setDataSourceDiseaseHistoryTable = useStore((store) => store.setDataSourceDiseaseHistoryTable)
+
+    const onFinish = (values) => {
+        if (selectedRowKey) {
+            let newData = dataSourceDiseaseHistoryTable.map((i) => {
+                if (i.id === values.id) return values
+                else return i
+            })
+            setDataSourceDiseaseHistoryTable(newData)
+        } else {
+            let id = new Date().getTime()
+            values.id = id
+            values.key = id
+            setDataSourceDiseaseHistoryTable([...dataSourceDiseaseHistoryTable, values])
+        }
+        form.resetFields()
+        setSelectedRowKey()
+    }
+
+    const handleClear = () => {
+        form.resetFields()
+        setSelectedRowKey()
+    }
 
     return (
         <SimpleGrid columns={['1', '2']} >
 
             <Form
+                onFinish={onFinish}
+                id='diseaseHistoryFormBloke'
                 form={form}
                 labelWrap
                 labelAlign="right"
@@ -22,6 +52,10 @@ function DiseaseHistoryFormBloke() {
                     maxWidth: 600,
                 }}
             >
+
+                <Form.Item hidden name='id'>
+                    <Input />
+                </Form.Item>
 
                 <Form.Item label="Breast" name="complaintBreastType">
                     <Select allowClear>
@@ -47,12 +81,14 @@ function DiseaseHistoryFormBloke() {
                 </Form.Item>
 
                 <Form.Item label="Complaints" name="complaintDescription">
-                    <Input.TextArea rows={3} />
+                    <Input.TextArea showCount maxLength={3000} rows={3} />
                 </Form.Item>
 
             </Form>
 
             <Form
+                onFinish={onFinish}
+                id='diseaseHistoryFormBloke'
                 form={form}
                 labelWrap
                 labelAlign="right"
@@ -70,7 +106,7 @@ function DiseaseHistoryFormBloke() {
                 <Form.Item label="ER" >
                     <Form.Item noStyle name="ihkEr">
                         <Radio.Group>
-                            <Space direction="horizontal">
+                            <Space direction="vertical">
                                 <Radio value={1}>Positive</Radio>
                                 <Radio value={2}>Negative</Radio>
                             </Space>
@@ -80,19 +116,22 @@ function DiseaseHistoryFormBloke() {
                         noStyle
                         shouldUpdate={(prevValues, currentValues) => prevValues.ihkEr !== currentValues.ihkEr}
                     >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ihkEr') === 1 ? (
-                                <Form.Item noStyle name="erN">
-                                    <InputNumber size='small' />
-                                </Form.Item>
-                            ) : ''}
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('ihkEr') === 1) {
+                                return (
+                                    <Form.Item noStyle name="erN">
+                                        <InputNumber />
+                                    </Form.Item>
+                                )
+                            } else return ''
+                        }}
                     </Form.Item>
                 </Form.Item>
 
                 <Form.Item label="PR" >
                     <Form.Item noStyle name="ihkPr">
                         <Radio.Group>
-                            <Space direction="horizontal">
+                            <Space direction="vertical">
                                 <Radio value={1}>Positive</Radio>
                                 <Radio value={2}>Negative</Radio>
                             </Space>
@@ -102,33 +141,43 @@ function DiseaseHistoryFormBloke() {
                         noStyle
                         shouldUpdate={(prevValues, currentValues) => prevValues.ihkPr !== currentValues.ihkPr}
                     >
-                        {({ getFieldValue }) =>
-                            getFieldValue('ihkPr') === 1 ? (
-                                <Form.Item noStyle name="prN">
-                                    <InputNumber size='small' />
-                                </Form.Item>
-                            ) : ''}
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('ihkPr') === 1) {
+                                return (
+                                    <Form.Item noStyle name="prN">
+                                        <InputNumber />
+                                    </Form.Item>
+                                )
+                            } else return ''
+                        }}
                     </Form.Item>
                 </Form.Item>
 
-                <Form.Item label="HER2" name="her2">
-                    <InputNumber
-                        min={0}
-                        max={3}
-                        defaultValue={0}
-                    />
-                </Form.Item>
-
-                <Form.Item
-                    noStyle
-                    shouldUpdate={(prevValues, currentValues) => prevValues.her2 !== currentValues.her2}
-                >
-                    {({ getFieldValue }) =>
-                        getFieldValue('her2') === 2 ? (
-                            <Form.Item label="FT" name="her2FT">
-                                <InputNumber />
-                            </Form.Item>
-                        ) : ''}
+                <Form.Item label="HER2" >
+                    <Form.Item noStyle name="her2">
+                        <InputNumber
+                            min={0}
+                            max={3}
+                            defaultValue={0}
+                        />
+                    </Form.Item>
+                    <Form.Item
+                        noStyle
+                        shouldUpdate={(prevValues, currentValues) => prevValues.her2 !== currentValues.her2}
+                    >
+                        {({ getFieldValue }) => {
+                            if (getFieldValue('her2') === 2) {
+                                return (
+                                    <Form.Item noStyle name="her2FT">
+                                        <InputNumber addonBefore="FT" />
+                                    </Form.Item>
+                                )
+                            } else {
+                                form.setFieldValue?.({her2FT:''})
+                                return ''
+                            }
+                        }}
+                    </Form.Item>
                 </Form.Item>
 
                 <Form.Item label="K67" name="k67">
@@ -136,15 +185,24 @@ function DiseaseHistoryFormBloke() {
                 </Form.Item>
 
                 <Form.Item label="Pathologist" name="pathologist">
-                    <Select allowClear>
-                        {/* {pathologistsList.map((i) => {
-                                return (
-                                    <Select.Option value={i.pathologistName}>
-                                        {i.pathologistName}
-                                    </Select.Option>
-                                );
-                            })} */}
-                    </Select>
+                    <PathologistSelectInput />
+                </Form.Item>
+
+                <Form.Item wrapperCol={{ offset: 8, span: 16 }}>
+                    <Space>
+
+                        <Button
+                            form='diseaseHistoryFormBloke'
+                            htmlType='submit'
+                            type="primary"
+                        >
+                            {selectedRowKey ? 'Edit' : 'Add'}
+                        </Button>
+
+                        <Button onClick={handleClear} danger>{selectedRowKey ? "Close" : "Clear"}</Button>
+
+
+                    </Space>
                 </Form.Item>
 
             </Form>

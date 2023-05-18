@@ -1,12 +1,12 @@
 import { Box } from '@chakra-ui/react';
 import './App.css';
-import Breadcrumb from './components/Breadcrumb';
 import ReactComponent from './components/RoutComponent';
 import SideBar from './components/SideBar';
 import { useLocalStorageStore } from './modules/store';
 import Login from './pages/Login';
 import { Layout } from 'antd';
 import { useEffectOnDidMountApp } from './modules/hooks';
+import { ErrorBoundary } from './pages/Error';
 
 function App() {
 
@@ -14,7 +14,7 @@ function App() {
 
   const token = useLocalStorageStore((store) => store.token)
 
-  // if (!token) return <Login />;
+  if (!token) return <Login />;
 
   return (
     <Layout
@@ -33,11 +33,13 @@ function App() {
             position: 'relative',
           }}
         >
-          <Box px={['1', '4']}>
+          <Box p={['1', '4']}>
 
-            <Breadcrumb />
+            {/* <Breadcrumb /> */}
 
-            <ReactComponent />
+            <ErrorBoundary>
+              <ReactComponent />
+            </ErrorBoundary>
 
           </Box>
         </Layout.Content>
