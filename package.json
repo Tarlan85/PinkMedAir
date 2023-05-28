@@ -2,7 +2,6 @@
   "name": "MedAir3",
   "version": "0.1.0",
   "private": true,
-  "homepage": "https://ramin-xanif-muslim.github.io/MedAir3",
   "dependencies": {
     "@chakra-ui/react": "^2.6.0",
     "@emotion/react": "^11.10.8",
@@ -28,10 +27,10 @@
     "zustand": "^4.3.7"
   },
   "scripts": {
-    "predeploy": "npm run build",
-    "deploy": "gh-pages -d build",
     "start": "react-scripts start",
-    "build": "react-scripts build"
+    "build": "react-scripts build",
+    "test": "jest",
+    "eject": "react-scripts eject"
   },
   "eslintConfig": {
     "extends": [
