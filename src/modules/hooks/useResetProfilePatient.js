@@ -17,8 +17,15 @@ function useResetProfilePatient() {
 
     const setRecipeList = useStore((store) => store.setRecipeList)
 
+    const setInitialValuesPersonInfoForm = useStore((store) => store.setInitialValuesPersonInfoForm)
+    const setInitialValuesDiseaseHistory = useStore((store) => store.setInitialValuesDiseaseHistory)
+    const setInitialValuesTreatment = useStore((store) => store.setInitialValuesTreatment)
+
 
     const resetProfilePatient = () => {
+        setInitialValuesPersonInfoForm({ gender: 'Female' })
+        setInitialValuesDiseaseHistory({})
+        setInitialValuesTreatment({})
         searchPatientForm.resetFields()
         patientForm.resetFields()
         personInfoForm.resetFields()

@@ -2,11 +2,16 @@ import React, { memo } from 'react'
 import { Form, Input } from 'antd'
 import { SimpleGrid } from '@chakra-ui/react'
 import { useGlobalContext } from '../../../../../modules/context/index.js'
+import { useStore } from '../../../../../modules/store/index.js'
 
 
 function TreatmentFormBloke() {
 
     const { treatmentHistoryForm } = useGlobalContext()
+
+    const initialValuesTreatment = useStore((store) => store.initialValuesTreatment)
+
+    const onFieldsChange = useStore((store) => store.onFieldsChange)
 
     return (
 
@@ -25,6 +30,8 @@ function TreatmentFormBloke() {
                 style={{
                     maxWidth: 600,
                 }}
+                initialValues={initialValuesTreatment}
+                onFieldsChange={onFieldsChange}
             >
 
                 <Form.Item label="Pre menopause" name="preMenopause">
@@ -50,6 +57,8 @@ function TreatmentFormBloke() {
                 style={{
                     maxWidth: 600,
                 }}
+                initialValues={initialValuesTreatment}
+                onFieldsChange={onFieldsChange}
             >
 
                 <Form.Item label="Menopause" name="menopause">
