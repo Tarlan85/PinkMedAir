@@ -106,7 +106,6 @@ function useSavePatient() {
     }
 
     const handleSave = async () => {
-        console.log('handleSave');
         setIsLoading(true)
         setTimeout(() => {
             setIsLoading(false)
