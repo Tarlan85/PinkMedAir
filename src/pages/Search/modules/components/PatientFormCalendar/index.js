@@ -17,8 +17,12 @@ const PatientFormCalendar = () => {
     const setDataSourceSearchTable = useStore((store) => store.setDataSourceSearchTable)
 
     const handleSearch = async () => {
-        setLoading(true)
         const form = searchPatientForm.getFieldsValue();
+        
+        let objectValuesAtt = Object.values(form)
+        if(!objectValuesAtt[0]) return
+
+        setLoading(true)
         const searchObj = { ...form }
         let res = await sendRequest("search", searchObj, "post");
         if (res?.data) {
