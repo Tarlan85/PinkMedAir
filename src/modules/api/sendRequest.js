@@ -22,7 +22,6 @@ const verificationToken = async (url) => {
        }
     } catch {
       message.error("ERROR: Verification Token ")
-      console.log("err in verificationToken");
     }
   }
 };

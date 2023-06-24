@@ -8,7 +8,7 @@ const Version = () => {
             _hover={{ color: "white" }}
             cursor="pointer"
         >
-            V1.0.7
+            V1.0.8
         </Center>
     );
 };
