@@ -37,4 +37,8 @@
     border: 1px solid #d9d9d9;
     border-radius: 5px;
 }
+.calendar_table_row_operation {
+    color: red;
+    font-weight: 700;
+}
 
