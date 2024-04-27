@@ -6,11 +6,11 @@ import { Box } from "@chakra-ui/react";
 import { useStore } from "../../modules/store";
 import dayjs from "dayjs";
 import { useOnRowTable } from "../../modules/hooks/useOnRowTable";
-import Alert from "../../components/Alert";
 
 const Search = () => {
-
-    const dataSourceSearchTable = useStore((store) => store.dataSourceSearchTable)
+    const dataSourceSearchTable = useStore(
+        (store) => store.dataSourceSearchTable
+    );
 
     const columns = [
         {
@@ -33,7 +33,7 @@ const Search = () => {
             dataIndex: "birthDate",
             key: "birthDate",
             render: (value, row, index) => {
-                if (!value) return ''
+                if (!value) return "";
                 return dayjs(value).format("DD-MM-YYYY");
             },
         },
@@ -44,29 +44,24 @@ const Search = () => {
         },
     ];
 
-    const { onRowTable, isLoading } = useOnRowTable()
+    const { onRowTable, isLoading } = useOnRowTable();
 
     return (
         <>
-            <Alert />
-
-            <Box boxShadow='xl' p='2' bg='pink.100' borderRadius='15px' >
-
-                <Box boxShadow='xl' p='2' bg='pink.50' borderRadius='15px' >
+            <Box boxShadow="xl" p="2" bg="pink.100" borderRadius="15px">
+                <Box boxShadow="xl" p="2" bg="pink.50" borderRadius="15px">
                     <PatientFormCalendar />
                 </Box>
 
-
-                <Box mt='2'>
-
+                <Box mt="2">
                     <Table
+                        rowKey="patientId"
                         loading={isLoading}
-                        size='small'
+                        size="small"
                         bordered
-                        pagination={false}
-                        scroll={{
-                            x: window.innerHeight
-                        }}
+                        // scroll={{
+                        //     x: window.innerHeight,
+                        // }}
                         locale={{
                             emptyText: (
                                 <Empty
@@ -76,14 +71,21 @@ const Search = () => {
                             ),
                         }}
                         columns={columns}
+                        pagination={false}
                         dataSource={dataSourceSearchTable}
                         onRow={(record, index) => ({
                             onClick: (e) => onRowTable(record, index),
                         })}
+                        // dataSource={new Array(200).fill(null)}
+                        // pagination={{
+                        //     total: 200,
+                        //     defaultPageSize: 100,
+                        //     pageSizeOptions: [100, 200, 300],
+                        //     position: ["bottomLeft"],
+                        // }}
+                        sticky={{ offsetHeader: 0 }}
                     />
-
                 </Box>
-
             </Box>
         </>
     );

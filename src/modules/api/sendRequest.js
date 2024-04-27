@@ -3,12 +3,6 @@ import axios from "axios";
 // let API_BASE = "http://localhost:8080/api/"
 let API_BASE = "http://5.189.181.111:8080/api/"
 
-// let API_BASE
-
-// axios.get("/localEnv.json").then((res) => {
-//   API_BASE = res.data.API_BASE;
-// });
-
 const verificationToken = async (url) => {
   if (url !== "login") {
     try {
@@ -18,7 +12,7 @@ const verificationToken = async (url) => {
         return "ok";
       }else if(res?.data === "no"){
         localStorage.clear()
-        window.location.reload();
+        // window.location.reload();
        }
     } catch {
       message.error("ERROR: Verification Token ")

@@ -1,6 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react'
 import { Box, Flex, useDisclosure } from '@chakra-ui/react'
-import EditTableComponent from '../../components/EditTableComponent'
 import { Form, Table, Tooltip, message } from 'antd'
 import sendRequest from '../../modules/api/sendRequest'
 import DeleteTableRow from '../../components/DeleteTableRow'
@@ -137,6 +136,7 @@ function ReceptionLocations() {
                 </Flex>
 
                 <Table
+                rowKey="visitPlaceId"
                     loading={isLoadingPlaces}
                     size='small'
                     bordered
