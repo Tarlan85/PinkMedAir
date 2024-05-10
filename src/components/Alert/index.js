@@ -8,6 +8,7 @@ function AlertComponent() {
     const isFieldsChange = useStore((store) => store.isFieldsChange);
     const setIsFieldsChange = useStore((store) => store.setIsFieldsChange);
 
+
     const onClose = () => {
         setIsFieldsChange(false);
     };
@@ -20,14 +21,7 @@ function AlertComponent() {
             <>
                 <Alert
                     message={
-                        <Box
-                            fontWeight="bold"
-                            fontSize="1xl"
-                            letterSpacing="wide"
-                            color="red.700"
-                        >
-                            You have an unsaved data!
-                        </Box>
+                        <Box fontWeight='bold' fontSize='1xl' letterSpacing='wide' color="red.700">You have unsaved patient data!</Box>
                     }
                     onClose={onClose}
                     // action={
