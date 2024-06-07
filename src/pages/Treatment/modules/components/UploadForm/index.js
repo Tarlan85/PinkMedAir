@@ -1,81 +1,115 @@
 import { Button, Image, Spin, Upload } from "antd";
 import React, { memo, useEffect, useState } from "react";
-import { UploadOutlined, CloseCircleOutlined } from "@ant-design/icons";
+import {
+    UploadOutlined,
+    CloseCircleOutlined,
+    LoadingOutlined,
+    PlusOutlined,
+} from "@ant-design/icons";
 import sendRequest from "../../../../../modules/api/sendRequest";
 import { Box, Flex } from "@chakra-ui/react";
 
-
-const UploadForm = ({ form, selectedRowKey, formName, setIsChangeForm }) => {
-
+const UploadForm = ({ form, formName, initialValuesTreatment }) => {
     const [imageUrl, setImageUrl] = useState();
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const showImage = (url) => {
         if (url) {
-            setImageUrl(url)
-        }else {
-            setImageUrl(null)
+            setImageUrl(url);
+        } else {
+            setImageUrl(null);
         }
-    }
+    };
 
     useEffect(() => {
-        if (selectedRowKey) {
-            const url = form.getFieldValue(`${formName}Url`)
-            showImage(url)
-        } else {
-            setImageUrl(null)
+        const url = initialValuesTreatment?.[`${formName}Url`];
+        if (url) {
+            showImage(url);
         }
-    }, [selectedRowKey])
+
+        return () => {
+            setImageUrl(null);
+        };
+    }, [initialValuesTreatment]);
 
     const beforeUpload = async (file) => {
-        setIsLoading(true)
+        setIsLoading(true);
         const formData = new FormData();
         formData.append("file", file);
 
         let res = await sendRequest("treatmentImage", formData, "post");
         if (res?.data) {
-            setIsChangeForm(true)
-            const url = res.data
-            showImage(url)
+            const url = res.data;
+            showImage(url);
             form.setFieldsValue({ [`${formName}Name`]: file.name });
-            form.setFieldsValue({ [`${formName}Url`]: file.data });
+            form.setFieldsValue({ [`${formName}Url`]: url });
         }
-        setIsLoading(false)
+        setIsLoading(false);
         return false;
     };
 
     const handleDeleteImg = () => {
         try {
-            setImageUrl(null)
-            form.setFieldsValue({ [`${formName}Name`]: '', [`${formName}Url`]: '' })
-            setIsChangeForm(true)
+            setImageUrl(null);
+            form.setFieldsValue({
+                [`${formName}Name`]: "",
+                [`${formName}Url`]: "",
+            });
         } catch (error) {
-            console.log('%c error', 'background: red; color: dark', error);
+            console.log("%c error", "background: red; color: dark", error);
         }
-    }
-
-    if(isLoading) {
-        return <Spin />
-    }
+    };
 
     return (
-        <>
-            {
-                imageUrl ? (
-
-                    <Flex gap='1' m='3' width={["100%", "100px"]}>
-
-                        <Image alt={formName} src={imageUrl} />
-
-                        <Box onClick={handleDeleteImg} _hover={{ color: 'red' }} ml='-1' cursor='pointer' >
-                            <CloseCircleOutlined />
-                        </Box>
-
-                    </Flex>
-
-                ) : (
-
+        <Spin spinning={isLoading}>
+            {imageUrl ? (
+                <Flex
+                    gap="1"
+                    m="3"
+                    width={["100%", "200px"]}
+                    position={"relative"}
+                >
+                    <Image
+                        style={{ width: "200px", height: "200px" }}
+                        objectFit="cover"
+                        alt={formName}
+                        src={imageUrl}
+                    />
+                    <Box
+                        onClick={handleDeleteImg}
+                        _hover={{ color: "red" }}
+                        top="-6"
+                        right="1"
+                        cursor="pointer"
+                        position={"absolute"}
+                    >
+                        <CloseCircleOutlined />
+                    </Box>
+                </Flex>
+            ) : (
+                <>
                     <Upload
+                        accept=".png,.jpeg,.jpg"
+                        listType="picture-card"
+                        beforeUpload={beforeUpload}
+                        showUploadList={false}
+                    >
+                        {!imageUrl && (
+                            <button
+                                style={{ border: 0, background: "none" }}
+                                type="button"
+                            >
+                                {isLoading ? (
+                                    <LoadingOutlined />
+                                ) : (
+                                    <PlusOutlined />
+                                )}
+                                <div style={{ marginTop: 8 }}>Upload</div>
+                            </button>
+                        )}
+                    </Upload>
+
+                    {/* <Upload
                         accept=".png,.jpeg,.jpg"
                         listType="picture"
                         beforeUpload={beforeUpload}
@@ -85,10 +119,10 @@ const UploadForm = ({ form, selectedRowKey, formName, setIsChangeForm }) => {
                         ) : (
                             ""
                         )}
-                    </Upload>
-
-                )}
-        </>
+                    </Upload> */}
+                </>
+            )}
+        </Spin>
     );
 };
 export default memo(UploadForm);

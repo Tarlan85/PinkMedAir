@@ -14,8 +14,6 @@ import { Box, SimpleGrid } from "@chakra-ui/react";
 import { useStore } from "../../../../../modules/store";
 import dayjs from "dayjs";
 import PathologistFormItem from "../../../../../components/FormItems/PathologistFormItem";
-import UploadForm from "../UploadForm";
-import logo from "../../../../../modules/images/MedAir.jpg";
 
 function TreatmentTableFormBloke(props) {
     const { selectedRowKey, setSelectedRowKey, form } = props;
@@ -122,28 +120,6 @@ function TreatmentTableFormBloke(props) {
             }}
             onFieldsChange={onFieldsChange}
         >
-            <SimpleGrid columns={["1", "2"]} gap="1">
-                <Box maxW="600px">
-                    <Form.Item label="Photo before">
-                        <UploadForm
-                            formName="photoBefore"
-                            form={form}
-                            selectedRowKey={selectedRowKey}
-                            setIsChangeForm={setIsChangeForm}
-                        />
-                    </Form.Item>
-                </Box>
-                <Box maxW="600px">
-                    <Form.Item label="Photo after">
-                        <UploadForm
-                            formName="photoAfter"
-                            form={form}
-                            selectedRowKey={selectedRowKey}
-                            setIsChangeForm={setIsChangeForm}
-                        />
-                    </Form.Item>
-                </Box>
-            </SimpleGrid>
 
             <SimpleGrid columns={["1", "2"]} gap="1">
                 <Box maxW="600px">

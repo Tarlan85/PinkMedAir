@@ -29,7 +29,7 @@ async function sendRequest(url, obj = {}, CRUD = "get") {
       return result;
     }
   } catch (e) {
-    message.error(e.message)
+    message.error(e.message, 2);
   }
 }
 
