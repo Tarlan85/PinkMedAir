@@ -36,7 +36,7 @@ const ProfilePage = () => {
                 <section className={styles.section} ref={refPatient}>
                     <hr />
                     <h2 id="Patient">Patient</h2>
-                    <ProfilePatientForm />
+                    <ProfilePatientForm inViewPatient={inViewPatient} />
                 </section>
                 <section className={styles.section} ref={refPersonInfo}>
                     <hr />

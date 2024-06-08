@@ -1,13 +1,18 @@
-import dayjs from "dayjs"
-import { fetchPatientId, postAnalyses, postMorby, postPersonInfo, postTreatment, postVisit } from "../api/index.js"
-import { useGlobalContext } from "../context/index.js"
-import { useStore } from "../store/index.js"
-import { useState } from "react"
-
+import dayjs from "dayjs";
+import {
+    fetchPatientId,
+    postAnalyses,
+    postMorby,
+    postPersonInfo,
+    postTreatment,
+    postVisit,
+} from "../api/index.js";
+import { useGlobalContext } from "../context/index.js";
+import { useStore } from "../store/index.js";
+import { useState } from "react";
 
 function useSavePatient() {
-
-    const [isLoading, setIsLoading] = useState(false)
+    const [isLoading, setIsLoading] = useState(false);
 
     const {
         patientForm,
@@ -15,36 +20,43 @@ function useSavePatient() {
         diseaseHistoryForm,
         familyMembersList,
         treatmentHistoryForm,
-    } = useGlobalContext()
+    } = useGlobalContext();
 
+    const dataSourceDiseaseHistoryTable = useStore(
+        (store) => store.dataSourceDiseaseHistoryTable
+    );
+    const savedDrawingCanvas = useStore((store) => store.savedDrawingCanvas);
+    const dataSourceVisitTable = useStore(
+        (store) => store.dataSourceVisitTable
+    );
+    const dataSourceAnalysisTable = useStore(
+        (store) => store.dataSourceAnalysisTable
+    );
+    const dataSourceTreatmentTable = useStore(
+        (store) => store.dataSourceTreatmentTable
+    );
+    const recipeList = useStore((store) => store.recipeList);
+    const setIsFieldsChange = useStore((store) => store.setIsFieldsChange);
+    const setIsUnsavedPatient = useStore((store) => store.setIsUnsavedPatient);
 
-    const dataSourceDiseaseHistoryTable = useStore((store) => store.dataSourceDiseaseHistoryTable)
-    const savedDrawingCanvas = useStore((store) => store.savedDrawingCanvas)
-    const dataSourceVisitTable = useStore((store) => store.dataSourceVisitTable)
-    const dataSourceAnalysisTable = useStore((store) => store.dataSourceAnalysisTable)
-    const dataSourceTreatmentTable = useStore((store) => store.dataSourceTreatmentTable)
-    const recipeList = useStore((store) => store.recipeList)
-    const setIsFieldsChange = useStore((store) => store.setIsFieldsChange)
-    const setIsUnsavedPatient = useStore((store) => store.setIsUnsavedPatient)
-
-
-    const initialValuesPersonInfoForm = useStore((store) => store.initialValuesPersonInfoForm)
+    const initialValuesPersonInfoForm = useStore(
+        (store) => store.initialValuesPersonInfoForm
+    );
 
     const savePersonInfo = (patientId) => {
-        const {
-            patientName,
-            patientSurName,
-            patientPatronymic,
-        } = patientForm.getFieldsValue()
+        const { patientName, patientSurName, patientPatronymic } =
+            patientForm.getFieldsValue();
 
-        const isdata = !!Object.values(personInfoForm.getFieldsValue())[0]
-        const data = isdata ? personInfoForm.getFieldsValue() : initialValuesPersonInfoForm
+        const isdata = !!Object.values(personInfoForm.getFieldsValue())[0];
+        const data = isdata
+            ? personInfoForm.getFieldsValue()
+            : initialValuesPersonInfoForm;
 
-        let { birthDate, alkogol, smoke } = data
+        let { birthDate, alkogol, smoke } = data;
 
         const sendObj = {
             ...data,
-            birthDate: dayjs(birthDate).format('YYYY-MM-DD'),
+            birthDate: dayjs(birthDate).format("YYYY-MM-DD"),
             alkogol: alkogol ? 1 : 0,
             smoke: smoke ? 1 : 0,
             patientName,
@@ -54,14 +66,17 @@ function useSavePatient() {
         };
 
         postPersonInfo(sendObj);
-    }
+    };
 
-    const initialValuesDiseaseHistory = useStore((store) => store.initialValuesDiseaseHistory)
+    const initialValuesDiseaseHistory = useStore(
+        (store) => store.initialValuesDiseaseHistory
+    );
 
     const saveMorby = (patientId) => {
-
-        const isdata = !!Object.values(diseaseHistoryForm.getFieldsValue())[0]
-        const data = isdata ? diseaseHistoryForm.getFieldsValue() : initialValuesDiseaseHistory
+        const isdata = !!Object.values(diseaseHistoryForm.getFieldsValue())[0];
+        const data = isdata
+            ? diseaseHistoryForm.getFieldsValue()
+            : initialValuesDiseaseHistory;
 
         const sendObj = {
             ...data,
@@ -71,30 +86,35 @@ function useSavePatient() {
             deseaseHistoryDynamicsList: dataSourceDiseaseHistoryTable,
         };
         postMorby(sendObj);
-    }
+    };
 
     const saveVisit = (patientId) => {
         const sendObj = {
             patientVisitsList: dataSourceVisitTable,
-            patientId
+            patientId,
         };
         postVisit(sendObj);
-    }
+    };
 
     const saveAnalyses = (patientId) => {
         const sendObj = {
             analyzesMediaList: dataSourceAnalysisTable,
-            patientId
+            patientId,
         };
         postAnalyses(sendObj);
-    }
+    };
 
-    const initialValuesTreatment = useStore((store) => store.initialValuesTreatment)
+    const initialValuesTreatment = useStore(
+        (store) => store.initialValuesTreatment
+    );
 
     const saveTreatment = (patientId) => {
-
-        const isdata = !!Object.values(treatmentHistoryForm.getFieldsValue())[0]
-        const data = isdata ? treatmentHistoryForm.getFieldsValue() : initialValuesTreatment
+        const isdata = !!Object.values(
+            treatmentHistoryForm.getFieldsValue()
+        )[0];
+        const data = isdata
+            ? treatmentHistoryForm.getFieldsValue()
+            : initialValuesTreatment;
 
         const sendObj = {
             treatmentStatic: data,
@@ -103,26 +123,27 @@ function useSavePatient() {
             recipeList,
         };
         postTreatment(sendObj);
-    }
+    };
 
     const handleSave = async () => {
-        setIsUnsavedPatient(false)
-        setIsLoading(true)
+        setIsUnsavedPatient(false);
+        setIsLoading(true);
         setTimeout(() => {
-            setIsLoading(false)
-        }, 1000)
+            setIsLoading(false);
+        }, 1000);
 
         let id = patientForm.getFieldsValue().patientId;
-        let patientName = patientForm.getFieldsValue().patientName;
+        let { patientName, patientSurName, patientPatronymic } =
+            patientForm.getFieldsValue();
 
-        if (!patientName) return
+        if (!patientName || !patientSurName || !patientPatronymic) return;
 
         let patientId;
         if (id) {
             patientId = id;
         } else {
             patientId = await fetchPatientId();
-            patientForm.setFieldsValue({ patientId })
+            patientForm.setFieldsValue({ patientId });
         }
         if (patientId) {
             Promise.all([
@@ -131,13 +152,12 @@ function useSavePatient() {
                 saveVisit(patientId),
                 saveAnalyses(patientId),
                 saveTreatment(patientId),
-            ])
-            setIsFieldsChange(false)
+            ]);
+            setIsFieldsChange(false);
         }
-    }
+    };
 
-
-    return { handleSave, isLoading }
+    return { handleSave, isLoading };
 }
 
-export default useSavePatient
+export default useSavePatient;

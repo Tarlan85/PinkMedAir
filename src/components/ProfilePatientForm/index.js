@@ -5,7 +5,7 @@ import { SimpleGrid } from "@chakra-ui/react";
 import useSavePatient from "../../modules/hooks/useSavePatient.js";
 import { useStore } from "../../modules/store/index.js";
 
-function ProfilePatientForm() {
+function ProfilePatientForm({ inViewPatient }) {
     const { patientForm } = useGlobalContext();
 
     const { handleSave } = useSavePatient();
@@ -14,11 +14,28 @@ function ProfilePatientForm() {
         onFieldsChange: store.onFieldsChange,
     }));
 
+    const handleSubmit = async () => {
+        try {
+            await patientForm.validateFields()
+            handleSave();
+        } catch (error) {
+            console.error("Validation Failed:", error);
+        }
+    };
+    const onFinishFailed = async () => {
+            const element = document.getElementById("Patient");
+            element.scrollIntoView({
+                behavior: "smooth",
+                block: "center",
+                inline: "center",
+            });
+    };
+
     return (
         <>
             <Form
                 id="patientForm"
-                onFinish={handleSave}
+                onFinish={handleSubmit}
                 form={patientForm}
                 labelWrap
                 labelAlign="right"
@@ -29,6 +46,7 @@ function ProfilePatientForm() {
                     span: 16,
                 }}
                 onFieldsChange={onFieldsChange}
+                onFinishFailed={onFinishFailed}
             >
                 <SimpleGrid
                     gap={[1, 2]}
@@ -46,6 +64,7 @@ function ProfilePatientForm() {
                         key="patientName"
                         name="patientName"
                         label="Name"
+                        rules={[{ required: true }]}
                     >
                         <Input />
                     </Form.Item>
@@ -53,6 +72,7 @@ function ProfilePatientForm() {
                         key="patientSurName"
                         name="patientSurName"
                         label="Surname"
+                        rules={[{ required: true }]}
                     >
                         <Input />
                     </Form.Item>
@@ -61,6 +81,7 @@ function ProfilePatientForm() {
                         key="patientPatronymic"
                         label="Patronymic"
                         name="patientPatronymic"
+                        rules={[{ required: true }]}
                     >
                         <Input />
                     </Form.Item>
