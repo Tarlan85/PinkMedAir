@@ -166,16 +166,41 @@ function CanvasComponent({ image, imageName }) {
 
     const onFieldsChange = useStore((store) => store.onFieldsChange);
 
+    // const handleSave = () => {
+    //     onFieldsChange();
+    //     setBrushRadius(0);
+    //     setDisableSaveBtn(true);
+    //     setDisableCanvas(true);
+    //     let data = canvasRef.current.getSaveData();
+    //     savedDrawingCanvas[imageName + "Data"] = data;
+    //     savedDrawingCanvas[imageName + "Desc"] = JSON.stringify(descriptions);
+    //     setSavedDrawingCanvas(savedDrawingCanvas);
+    // };
     const handleSave = () => {
         onFieldsChange();
         setBrushRadius(0);
         setDisableSaveBtn(true);
         setDisableCanvas(true);
-        let data = canvasRef.current.getSaveData();
-        savedDrawingCanvas[imageName + "Data"] = data;
+        
+        const canvasData = canvasRef.current.getSaveData();
+        const parsedData = JSON.parse(canvasData);
+    
+        const imageWidth = canvasRef.current.canvas.drawing.width;
+        const imageHeight = canvasRef.current.canvas.drawing.height;
+    
+        parsedData.lines.forEach(line => {
+            line.points.forEach(point => {
+                point.x /= imageWidth;
+                point.y /= imageHeight;
+            });
+        });
+    
+        const relativeData = JSON.stringify(parsedData);
+        savedDrawingCanvas[imageName + "Data"] = relativeData;
         savedDrawingCanvas[imageName + "Desc"] = JSON.stringify(descriptions);
         setSavedDrawingCanvas(savedDrawingCanvas);
     };
+    
 
     const deleteSelectedLine = () => {
         if (selectedLineIndex !== null) {
@@ -246,17 +271,39 @@ function CanvasComponent({ image, imageName }) {
         deleteSelectedLine();
     };
 
-    const handleRestoreDrawing = () => {
-        let data =
-            savedDrawingCanvas && savedDrawingCanvas[imageName + "Data"]
-                ? savedDrawingCanvas[imageName + "Data"]
-                : "";
+    // const handleRestoreDrawing = () => {
+    //     let data =
+    //         savedDrawingCanvas && savedDrawingCanvas[imageName + "Data"]
+    //             ? savedDrawingCanvas[imageName + "Data"]
+    //             : "";
 
-        if (data) {
-            canvasRef.current.loadSaveData(data);
+    //     if (data) {
+    //         canvasRef.current.loadSaveData(data);
+    //         setTimeout(() => setDisableSaveBtn(true), 100);
+    //     }
+    // };
+    const handleRestoreDrawing = () => {
+        let relativeData = savedDrawingCanvas[imageName + "Data"];
+        
+        if (relativeData) {
+            const parsedData = JSON.parse(relativeData);
+    
+            const imageWidth = canvasRef.current.canvas.drawing.width;
+            const imageHeight = canvasRef.current.canvas.drawing.height;
+    
+            parsedData.lines.forEach(line => {
+                line.points.forEach(point => {
+                    point.x *= imageWidth;
+                    point.y *= imageHeight;
+                });
+            });
+    
+            const absoluteData = JSON.stringify(parsedData);
+            canvasRef.current.loadSaveData(absoluteData);
             setTimeout(() => setDisableSaveBtn(true), 100);
         }
     };
+    
 
     useEffect(() => {
         let timer = setTimeout(() => handleRestoreDrawing(), 1000);
